@@ -171,6 +171,29 @@ body.pl .scr{padding:76px 20px 32px}
 .cv .cover,.cv .endp{width:100%;height:100%;aspect-ratio:auto;border-radius:4px 18px 18px 4px;cursor:pointer}.endp{background:var(--card)}
 .cover{background:linear-gradient(135deg,var(--deep),color-mix(in srgb,var(--deep) 70%,#000));box-shadow:inset 6px 0 10px rgba(0,0,0,.25),var(--shadow)}
 #snd{position:fixed;left:12px;top:12px;z-index:60;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);cursor:pointer}
+
+/* ===== round 2 ===== */
+.nav .btn.wide{width:auto;padding:0 1.5em;font-size:1em;background:var(--deep);color:#fff}
+.env{font-size:clamp(8em,40vw,12em);animation:envf 2.4s ease-in-out infinite;filter:drop-shadow(0 14px 26px rgba(255,120,170,.5))}.env:active{transform:scale(.9)}
+@keyframes envf{50%{transform:translateY(-12px) rotate(-3deg)}}
+body[data-s="3"] .btn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.25)}
+body[data-s="3"] .btn.y{background:linear-gradient(135deg,#ff7aa8,#b86cff);border:0;box-shadow:0 0 26px rgba(255,122,168,.55)}
+body[data-s="3"] .card .btn{background:var(--deep);color:#fff;border:0}
+@keyframes gin{from{opacity:0;transform:scale(.3)}}@keyframes bob{to{translate:0 -8px}}
+.ex .btn{position:fixed;z-index:30;animation:gin .5s var(--sp) backwards,bob 1.8s ease-in-out infinite alternate}
+.hf.fd{bottom:auto;top:-40px;z-index:25;animation-name:hd}@keyframes hd{10%{opacity:.9}to{transform:translate(var(--dx),115vh) rotate(-20deg);opacity:0}}
+.gg{grid-template-columns:repeat(2,1fr);max-width:420px;margin:22px auto 0;gap:16px}
+.gb.btn{position:relative;overflow:hidden;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px!important;border-radius:28px;font-size:1.05em;color:#fff;box-shadow:0 14px 34px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.45);animation:gin .7s var(--sp) backwards,gfl 3.4s ease-in-out infinite alternate;animation-delay:calc(var(--i)*.12s),calc(var(--i)*-.7s)}
+.gb.btn::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:14px;margin-left:-7px;background:rgba(255,255,255,.25)}
+.gb.btn>*{position:relative;z-index:1}.gb .ic{font-size:3.2em;margin:0;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+.gb:nth-child(4n+1){--g1:#ff9ac1;--g2:#e0558a}.gb:nth-child(4n+2){--g1:#b99cff;--g2:#7a52d6}.gb:nth-child(4n+3){--g1:#ffc38a;--g2:#e9788a}.gb:nth-child(4n+4){--g1:#8fd5ff;--g2:#7a8cf0}
+body[data-s="3"] .gb.btn{background:linear-gradient(145deg,var(--g1),var(--g2));border:0;color:#fff}
+.gb.btn.sh{animation:shake .4s}.gb.btn.op{animation:none;opacity:.8}.gb.op::after{content:'✓';position:absolute;top:10px;right:14px;font-weight:700;z-index:2}
+@keyframes gfl{to{transform:translateY(-6px) rotate(1deg)}}
+.gp{opacity:.7;margin-top:22px}
+.modal{align-items:flex-end;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}@media(min-width:600px){.modal{align-items:center}}
+.card{background:rgba(255,253,251,.96)}.card.sheet{border-radius:32px 32px 0 0;animation:sheet .6s var(--sp)}@media(min-width:600px){.card.sheet{border-radius:32px}}
+@keyframes sheet{from{transform:translateY(100%)}}.gr{display:block;width:40px;height:5px;border-radius:3px;background:rgba(0,0,0,.2);margin:-10px auto 14px}
 </style></head>
 <body data-s="1"><div id="deco"></div><div id="app"></div>
 <script>
@@ -254,7 +277,7 @@ const pg=(p,i)=>`<div class="pg${ED&&i==ap?' ap':''}" data-i=${i}><div class=ln>
 function draw(){const n=per(),b=$('#book');if(!b)return;sp=Math.max(0,sp-sp%n);b.className=(n==1?'one ':'')+(ED?'ed':'');
 b.innerHTML=[...Array(n)].map((_,k)=>D.pages[sp+k]?pg(D.pages[sp+k],sp+k):'<div class="pg blank"></div>').join('');
 const L=sp+n>=D.pages.length,nx=$('#nx');$('#pi').textContent=`${sp+1}${n>1&&sp+2<=D.pages.length?'–'+(sp+2):''} / ${D.pages.length}`;
-$('#pv').disabled=sp==0;$('#pv').onclick=()=>turn(-1);nx.textContent=L&&!ED?'continue ♡':'›';nx.disabled=L&&ED;nx.onclick=()=>L&&!ED?conf():turn(1);
+$('#pv').disabled=sp==0;$('#pv').onclick=()=>turn(-1);nx.textContent=L&&!ED?'continue ♡':'›';nx.classList.toggle('wide',L&&!ED);nx.disabled=L&&ED;nx.onclick=()=>L&&!ED?conf():turn(1);
 const tb=$('#tb');if(tb){tb.innerHTML=D.pages.map((_,i)=>`<button class="tb${i>=sp&&i<sp+n?' on':''}" style="--c:${['#cdb8ff','#ffc2dc','#a9c4ff','#c8f5d9','#ffe9a8','#ffd3b6'][i%6]}" data-g=${i} aria-label="page ${i+1}">${i+1}</button>`).join('');
 tb.onclick=e=>{const g=e.target.closest('[data-g]');if(g){const i=+g.dataset.g,t=i-i%per();if(t!=sp)turn(t>sp?1:-1,t)}}}
 if(ED)wire()}
@@ -279,7 +302,7 @@ if(!ok){b.classList.add('bad');b.disabled=true;Snd.no();banner('Wrong',q.bad.len
 lk=1;const msg=q.ok;Snd.ok();
 b.classList.add(ok?'ok':'bad');$('.opts').classList.add('lk');$$('.stars span')[qi].classList.add('f');burst(r.left+r.width/2,r.top+r.height/2,14);$('#fb').innerHTML=`<div class="pop ${ok?'g':'r'}">${esc(msg)}</div>`;
 setTimeout(()=>qi+1<D.quiz.length?quiz(qi+1):done(),1600)}
-function done(){Mu.stop();clearInterval(hv);$('#pl')?.remove();document.body.classList.remove('pl');
+function done(){clearInterval(hv);
 show(`<div class=note><h1>🎉</h1><h2>${esc(D.doneText)}</h2><p>there's one more thing for you...</p><button class=btn id=op>open it</button></div>`,1);deco(['🎉','✨','⭐','💜'],12);$('#op').onclick=openNb}
 function openNb(){show('<div id=tb class=tbs style="opacity:0"></div><div id=book></div><div class=nav style="opacity:0"><button class=btn id=pv>‹</button><span id=pi></span><button class=btn id=nx>›</button></div>',2);deco(['✨','☁️','💜'],8);sp=0;draw();
 const b=$('#book'),n=per(),L=b.firstElementChild,c=document.createElement('div');c.className='fl cv';
@@ -296,14 +319,21 @@ show(`<div class=cf><h1>${esc(C.h)}</h1><button class=env id=env aria-label="ope
 $('#env').onclick=()=>{$('#env').remove();$('#hint').remove();burst(innerWidth/2,innerHeight*.45,22);
 $('.cf').insertAdjacentHTML('beforeend',`<div class=lp>${ps.map((p,i)=>`<p class=fu style="animation-delay:${i*.9+.4}s">${esc(p)}</p>`).join('')}</div><div class=fu style="animation-delay:${ps.length*.9+1}s"><h2>${esc(C.q)}</h2><button class="btn y" id=yes>${esc(C.yes)}</button><button class=btn id=no>${esc(C.no)}</button><p id=nm></p></div>`);
 setTimeout(()=>$('#yes')?.scrollIntoView({behavior:rm?'auto':'smooth',block:'center'}),(ps.length*.9+2)*1000);let nc=0;
-$('#yes').onclick=()=>{Snd.ok();burst();show(`<div class=cf><h1>${esc(C.yay)}</h1></div>`,3);setTimeout(gifts,2200)};
-$('#no').onclick=()=>{const M=["I think you missclicked, try again :P","Are you sure about that? :(","I'll take that as a maybe..."];$('#nm').textContent=M[Math.min(nc,2)];
-if(nc<2){if(!rm)$('#no').style.transform=`translate(${(Math.random()-.5)*90}px,${(Math.random()-.5)*50}px)`}
-else{$('#no').style.transform='none';if(!$('#n2')){$('#nm').insertAdjacentHTML('afterend',`<button class=btn id=n2>${esc(C.no2)}</button>`);$('#n2').onclick=()=>show(`<div class=cf><h1>💜</h1><p>${esc(C.noEnd)}</p></div>`,3)}}nc++}}}
-function gifts(){show(`<div class=cf style="max-width:700px"><h1>${esc(D.giftsTitle)}</h1><p>${esc(D.giftsText)}</p><div class=gg>${D.gifts.map((g,i)=>`<button class="gb btn" style="--i:${i}" data-i=${i}><span class=ic>${esc(g.icon||'🎁')}</span>${esc(g.title)}</button>`).join('')}</div></div>`,3);deco(['🌸','🪻','💜','✨','🐰','🐱'],14,1);
-$('.gg').onclick=e=>{const b=e.target.closest('.gb');if(!b)return;const g=D.gifts[+b.dataset.i];b.classList.add('sh');
-setTimeout(()=>{b.classList.remove('sh');b.classList.add('op');const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,18);const m=document.createElement('div');m.className='modal';
-m.innerHTML=`<div class=card>${g.img?`<img src="${esc(g.img)}" alt="">`:''}<h2>${esc(g.title)}</h2><p>${esc(g.desc)}</p>${g.msg?`<p style="font:1.5em var(--fh)">${esc(g.msg)}</p>`:''}${emb(g.spotify,0,g.title,g.desc)}<br><button class=btn id=cl>close</button></div>`;
+const yay=()=>{$('#ex')?.remove();Snd.ok();burst();show(`<div class=cf><h1>${esc(C.yay)}</h1></div>`,3);setTimeout(gifts,2200)};$('#yes').onclick=yay;
+const NM=["I think you missclicked, try again :P","Are you sure about that? :(","Hmm, the No button looks nervous...","Look, the Yes button is getting bigger 👀","Please? 🥺","I made you some more Yes buttons","The No button is shrinking, it's scared","Come on, I know you want to click Yes","I'll be sad forever 😭","Last chance... (it isn't)","Okay the No button is leaving 👋","Now there's only Yes left 💜"],YL=['Yes!!','Yesss 🥺','Yes please','Definitely yes','Obviously yes','Yes 💜','Yes yes yes','Say yes 🐰'],NL=['No','Nope','No?','nooo','n-no...','..no','n'];
+const rain=(a,n)=>{if(rm)return;for(let i=0;i<n;i++){const h=document.createElement('span');h.className='hf fd';h.textContent=a[i%a.length];h.style.cssText=`left:${Math.random()*92}%;font-size:${22+Math.random()*20}px;--dx:${(Math.random()-.5)*80}px;animation-duration:${3+Math.random()*3}s;animation-delay:${Math.random()*.6}s`;document.body.append(h);setTimeout(()=>h.remove(),7000)}};
+$('#no').onclick=()=>{const no=$('#no'),ye=$('#yes');$('#nm').textContent=NM[Math.min(nc,NM.length-1)];Snd.no();
+if(!rm)document.body.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:300});
+nc++;ye.style.transform=`scale(${Math.min(1+nc*.1,1.8)})`;ye.style.margin=`${6+nc*5}px`;
+no.style.transform=`translate(${(Math.random()-.5)*Math.min(60+nc*15,200)}px,${(Math.random()-.5)*50}px) scale(${Math.max(.45,1-nc*.06)})`;no.textContent=NL[Math.min(nc,NL.length-1)];
+rain(['🥺','💔','🐰','😭'],3+nc);
+if(nc>=3){const ex=$('#ex')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'ex',className:'ex'}));
+for(let k=0;k<(nc<7?1:2);k++){const y=document.createElement('button');y.className='btn y yb';y.textContent=YL[Math.random()*YL.length|0];y.style.cssText=`left:${8+Math.random()*60}%;top:${14+Math.random()*68}%;font-size:${.9+Math.random()*.6}em`;y.onclick=yay;ex.append(y);Snd.pop()}}
+if(nc>=11)no.remove()}}}
+function gifts(){const seen=new Set;show(`<div class=cf style="max-width:700px"><h1>${esc(D.giftsTitle)}</h1><p>${esc(D.giftsText)}</p><div class=gg>${D.gifts.map((g,i)=>`<button class="gb btn" style="--i:${i}" data-i=${i}><span class=ic>${esc(g.icon||'🎁')}</span>${esc(g.title)}</button>`).join('')}</div><p id=gp class=gp>0 / ${D.gifts.length} opened</p></div>`,3);deco(['🌸','🪻','💜','✨','🐰','🐱'],14,1);
+$('.gg').onclick=e=>{const b=e.target.closest('.gb');if(!b)return;const g=D.gifts[+b.dataset.i];Snd.pop();b.classList.add('sh');
+setTimeout(()=>{b.classList.remove('sh');b.classList.add('op');seen.add(b.dataset.i);$('#gp').textContent=seen.size==D.gifts.length?'that was everything 💜':`${seen.size} / ${D.gifts.length} opened`;const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,18);Snd.ok();const m=document.createElement('div');m.className='modal';
+m.innerHTML=`<div class="card sheet"><i class=gr></i>${g.img?`<img src="${esc(g.img)}" alt="">`:''}<h2>${esc(g.title)}</h2><p>${esc(g.desc)}</p>${g.msg?`<p style="font:1.5em var(--fh)">${esc(g.msg)}</p>`:''}${emb(g.spotify,0,g.title,g.desc)}<br><button class=btn id=cl>close</button></div>`;
 document.body.append(m);const c=()=>m.remove();$('#cl',m).onclick=c;m.onclick=ev=>ev.target==m&&c()},rm?0:480)}}
 /* ---------- upload + save ---------- */
 async function up(f){if(!f)return;if(!/^image\/(png|jpe?g|webp|gif)$/.test(f.type)||f.size>3e6){alert('Use PNG, JPG, WEBP or GIF under 3 MB.');return}
@@ -384,10 +414,11 @@ const Snd={on:1,c:null,t(f,d=.1,ty='sine',v=.12,at=0,f2){if(!Snd.on)return;try{c
 tap(){Snd.t(1500,.04,'square',.035);navigator.vibrate?.(5)},ok(){[1047,1319,1568,2093].forEach((f,i)=>Snd.t(f,.35,'sine',.12,i*.08))},no(){Snd.t(180,.18,'triangle',.25);Snd.t(150,.2,'triangle',.25,.15);navigator.vibrate?.([30,40,30])},pop(){Snd.t(500,.12,'sine',.2,0,1100)},sq(){Snd.t(900,.18,'triangle',.15,0,1700)},fl(){Snd.t(700,.3,'sawtooth',.03,0,150)}};
 const Mu={p:null,id:null,ready:[],playing:0,
 init(){if(Mu.i)return;Mu.i=1;document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;left:-9999px;width:200px;height:200px"><div id=ytp></div></div>');
-window.onYouTubeIframeAPIReady=()=>{Mu.p=new YT.Player('ytp',{width:200,height:200,playerVars:{playsinline:1,controls:0},events:{onReady:()=>{Mu.ready.forEach(f=>f());Mu.ready=[]},onStateChange:e=>{if(e.data==0)Mu.p.playVideo();Mu.ui(e.data)},onError:()=>{banner('Can’t play this song','try a different upload of it');Mu.ui(2)}}})};
+window.onYouTubeIframeAPIReady=()=>{Mu.p=new YT.Player('ytp',{width:200,height:200,playerVars:{playsinline:1,controls:0},events:{onReady:()=>{Mu.ready.forEach(f=>f());Mu.ready=[]},onStateChange:e=>{if(e.data==0)Mu.end();Mu.ui(e.data)},onError:()=>{banner('Can’t play this song','try a different upload of it');Mu.ui(2)}}})};
 const x=document.createElement('script');x.src='https://www.youtube.com/iframe_api';document.head.append(x)},
-play(u){const id=yid(u);if(!id)return;Mu.init();const go=()=>{if(Mu.id!=id){Mu.id=id;Mu.p.loadVideoById(id)}else Mu.p.playVideo()};Mu.p?go():Mu.ready.push(go)},
+play(u){const id=yid(u);if(!id)return;if($('#pl')&&yid(D.music.url)!=id)Mu.end();Mu.init();const go=()=>{if(Mu.id!=id){Mu.id=id;Mu.p.loadVideoById(id)}else Mu.p.playVideo()};Mu.p?go():Mu.ready.push(go)},
 toggle(u){const id=yid(u);if(Mu.id==id&&Mu.p)Mu.playing?Mu.p.pauseVideo():Mu.p.playVideo();else Mu.play(u)},
+end(){const p=$('#pl');document.body.classList.remove('pl');p&&p.animate([{opacity:1},{opacity:0,transform:'scale(.6)'}],{duration:400}).finished.then(()=>p.remove())},
 stop(){Mu.ready=[];Mu.p?.stopVideo?.();Mu.id=null;Mu.ui(5)},
 ui(s){Mu.playing=s==1;$$('[data-mu]').forEach(b=>{b.textContent=yid(b.dataset.mu)==Mu.id&&Mu.playing?'❚❚':'▶'});$('#pl')?.classList.toggle('pp',Mu.playing)}};
 function banner(t,m){$('.bn')?.remove();const d=document.createElement('div');d.className='bn';d.innerHTML=`<i>✕</i><div><b>${esc(t)}</b><small>${esc(m)}</small></div><em>now</em>`;document.body.append(d);
