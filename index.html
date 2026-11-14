@@ -214,7 +214,7 @@ create policy "admin assets" on storage.objects for all to authenticated using (
 3) Paste your Project URL and anon public key below (never the service-role key).
 4) Open yoursite/#admin to edit, /#preview to see your draft, / is the public site.
 Leave both empty to test locally (saves in this browser only). */
-const SB_URL='',SB_KEY='';
+const SB_URL='https://iwnumncagbnomtdxtvob.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3bnVtbmNhZ2Jub210ZHh0dm9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2ODA5ODQsImV4cCI6MjExMDI1Njk4NH0.7DWRWEmd6dGpWVia73alqAkTsPC8GehEdXodbEcQ_OU';
 const sb=SB_URL&&window.supabase?supabase.createClient(SB_URL,SB_KEY):null;
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -337,12 +337,14 @@ setTimeout(()=>{b.classList.remove('sh');b.classList.add('op');seen.add(b.datase
 m.innerHTML=`<div class="card sheet"><i class=gr></i>${gal(g)}<h2>${esc(g.title)}</h2><p>${esc(g.desc)}</p>${g.msg?`<p style="font:1.5em var(--fh)">${esc(g.msg)}</p>`:''}${emb(g.spotify,0,g.title,g.desc)}<br><button class=btn id=cl>close</button></div>`;
 document.body.append(m);const c=()=>m.remove();$('#cl',m).onclick=c;m.onclick=ev=>ev.target==m&&c()},rm?0:480)}}
 /* ---------- upload + save ---------- */
+const idb=(m,k,v)=>new Promise((res,rej)=>{const r=indexedDB.open('nb',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onerror=()=>rej(r.error);r.onsuccess=()=>{const t=r.result.transaction('kv',m=='get'?'readonly':'readwrite'),o=t.objectStore('kv'),q=m=='get'?o.get(k):o.put(v,k);t.oncomplete=()=>res(q.result);t.onerror=()=>rej(t.error)}});
 async function up(f){if(!f)return;if(!/^image\/(png|jpe?g|webp|gif)$/.test(f.type)||f.size>3e6){alert('Use PNG, JPG, WEBP or GIF under 3 MB.');return}
-if(!sb)return new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f)});
+if(!sb)return new Promise(r=>{if(f.type=='image/gif'){const fr=new FileReader();fr.onload=()=>r(fr.result);return fr.readAsDataURL(f)}const i=new Image(),u=URL.createObjectURL(f);i.onload=()=>{const k=Math.min(1,1400/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(u);r(c.toDataURL('image/webp',.85))};i.onerror=()=>r(null);i.src=u});
 const path=crypto.randomUUID()+'.'+f.name.split('.').pop().toLowerCase(),{error}=await sb.storage.from('assets').upload(path,f,{contentType:f.type});
 if(error){alert(error.message);return}return sb.storage.from('assets').getPublicUrl(path).data.publicUrl}
-async function save(pub){const st=$('#st');st.textContent='saving…';try{if(sb){const r={id:1,draft:D};if(pub)r.published=D;const{error}=await sb.from('site_content').upsert(r);if(error)throw error}
-else{localStorage.draft=JSON.stringify(D);if(pub)localStorage.pub=localStorage.draft}st.textContent=(pub?'published':'draft saved')+' ✓'}catch(e){st.textContent='error: '+(e.message||e)}}
+async function offload(o){for(const k in o){const v=o[k];if(typeof v=='string'&&v.startsWith('data:image/')){const b=await(await fetch(v)).blob(),path=crypto.randomUUID()+'.'+b.type.split('/')[1],{error}=await sb.storage.from('assets').upload(path,b,{contentType:b.type});if(error)throw error;o[k]=sb.storage.from('assets').getPublicUrl(path).data.publicUrl}else if(v&&typeof v=='object')await offload(v)}}
+async function save(pub){const st=$('#st');st.textContent='saving…';try{if(sb){st.textContent='uploading images…';await offload(D);st.textContent='saving…';const r={id:1,draft:D};if(pub)r.published=D;const{error}=await sb.from('site_content').upsert(r);if(error)throw error}
+else{const j=JSON.stringify(D);await idb('set','draft',j);try{delete localStorage.draft}catch(e){}if(pub){await idb('set','pub',j);try{delete localStorage.pub}catch(e){}}}st.textContent=(pub?'published':'draft saved')+' ✓'}catch(e){st.textContent='error: '+(e.message||e)}}
 /* ---------- admin ---------- */
 const ST={Cats:'🐱 😺 🐈 😻 🐾',Bunnies:'🐰 🐇 🥕',Flowers:'🌸 🌷 🌹 🪻 🌼 💐',Hearts:'💜 🩷 💗 💌 💘',Stars:'⭐ ✨ 🌟 💫',Bows:'🎀 🧸 🪄',Music:'🎵 🎶 🎧 💿 🎤',Sky:'☁️ 🌈 🌙',Fun:'🏴‍☠️ 👒 🍖 🎮 🍪 🍓'};
 const FONTS=['Inter','Playfair Display','Cormorant Garamond','Jost','Work Sans'];
@@ -440,10 +442,10 @@ document.body.insertAdjacentHTML('beforeend','<button id=snd aria-label="sound e
 let lw=innerWidth;onresize=()=>{if(innerWidth==lw)return;lw=innerWidth;if($('#book')){draw();ED&&panel()}};
 app.onclick=e=>{const b=e.target.closest('.opt');if(b)answer(b)};
 (async()=>{const h=location.hash;ED=h=='#admin';const pv=h=='#preview';
-try{if(sb){if(ED||pv){const{data:{session}}=await sb.auth.getSession();if(!session&&ED)return login();const{data}=await sb.from('site_content').select('draft').maybeSingle();if(data?.draft)D=Object.assign(D,data.draft)}
+try{if(sb){if(ED||pv){const{data:{session}}=await sb.auth.getSession();if(!session&&ED)return login();const{data}=await sb.from('site_content').select('draft').maybeSingle();if(data?.draft)D=Object.assign(D,data.draft);else if(ED){const l=await idb('get','draft').catch(()=>0)||localStorage.draft;if(l)D=Object.assign(D,JSON.parse(l))}}
 else{const{data}=await sb.from('public_site').select('published').maybeSingle();if(data?.published)D=Object.assign(D,data.published)}}
-else{const s=localStorage[ED||pv?'draft':'pub'];if(s)D=Object.assign(D,JSON.parse(s))}}catch(e){console.warn(e)}
-theme();if(ED&&!sb)localStorage.adm=1;let isA;try{isA=sb?(await sb.auth.getSession()).data.session:localStorage.adm}catch(e){}
+else{const kk=ED||pv?'draft':'pub',s=(await idb('get',kk).catch(()=>0))||localStorage[kk];if(s)D=Object.assign(D,JSON.parse(s))}}catch(e){console.warn(e)}
+theme();if(ED&&!sb)try{localStorage.adm=1}catch(e){}let isA;try{isA=sb?(await sb.auth.getSession()).data.session:localStorage.adm}catch(e){}
 ED?admin():landing();if(!ED&&isA)document.body.insertAdjacentHTML('beforeend','<a id=eb href="#admin">✎ edit site</a>')})();
 addEventListener('hashchange',()=>location.reload());
 </script></body></html>
